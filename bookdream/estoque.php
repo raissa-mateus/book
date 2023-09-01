@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 }
 
 // Retrieve book data from the database
-$sql = "SELECT id, titulo, autor, editora, genero, qtd FROM livros";
+$sql = "SELECT id, titulo, autor, editora, genero, classificacao, idioma, qtd FROM livros";
 $result = $conn->query($sql);
 
 ?>
@@ -68,7 +68,7 @@ $result = $conn->query($sql);
         #header {
         margin-left: 0;
         background-color: #AFCCF4;
-        padding: 10px;
+        padding: 0px;
         display: flex;
         align-items: center;
         }
@@ -120,11 +120,11 @@ $result = $conn->query($sql);
         <img class="logo" src="imagens/logo-book-dream2.png">
         <div id="menu1">
             <a href="cadlivro.php">Cadastro</a>
-            <a href="#">Estoque</a>
+            <a href="estoque.php">Estoque</a>
             <a href="carrinho.php">Carrinho</a>
         </div>
         <div id="menu2">
-            <a href="">Sair</a>
+            <a href="logout.php">Sair</a>
             <a href="login.php">login</a>
         </div>
     </div>
@@ -133,17 +133,26 @@ $result = $conn->query($sql);
 <div class="container">
 <h1>Estoque de Livros</h1>
 <h2>Consulta de Livros</h2>
-    <form method="get" action="resultados.php">
-        <input type="text" name="query" placeholder="Digite sua pesquisa" required>
-        <input type="submit" value="Pesquisar">
-    </form>
 
+<form method="get" action="estoque.php">
+    <input type="text" name="search" placeholder="Digite sua pesquisa">
+    <select name="filter">
+        <option value="titulo">Título</option>
+        <option value="autor">Autor</option>
+        <option value="editora">Editora</option>
+        <option value="genero">Gênero</option>
+        <option value="classificacao">Classificação</option>
+    </select>
+    <input type="submit" value="Pesquisar">
+</form>
 <table>
     <tr>
         <th>Título</th>
         <th>Autor</th>
         <th>Editora</th>
         <th>Gênero</th>
+        <th>Classificação</th>
+        <th>Idioma</th>
         <th>Quantidade</th>
         <th>Ações</th>
     </tr>
@@ -151,6 +160,19 @@ $result = $conn->query($sql);
 
 
     <?php
+    $searchTerm = $_GET['search'] ?? '';
+    $filter = $_GET['filter'] ?? 'titulo';
+    
+    $sql = "SELECT id, titulo, autor, editora, genero, classificacao, idioma, qtd FROM livros";
+    
+    if (!empty($searchTerm)) {
+        $filter = mysqli_real_escape_string($conn, $filter);
+        $searchTerm = mysqli_real_escape_string($conn, $searchTerm);
+        $sql .= " WHERE $filter LIKE '%$searchTerm%'";
+    }
+    
+    $result = $conn->query($sql);
+
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             echo "<tr>";
@@ -158,16 +180,18 @@ $result = $conn->query($sql);
             echo "<td>" . $row["autor"] . "</td>";
             echo "<td>" . $row["editora"] . "</td>";
             echo "<td>" . $row["genero"] . "</td>";
+            echo "<td>" . $row["classificacao"] . "</td>";
+            echo "<td>" . $row["idioma"] . "</td>";
             echo "<td>" . $row["qtd"] . "</td>";
             echo "<td>";
-            echo "<a href='editar_item.php?id=" . $row["id"] . "'>editar</a> ";
-            echo "<a href='remover.php?id=" . $row["id"] . "'>excluir</a>";
+            echo "<a href='editar_livro.php?id=" . $row["id"] . "'>editar</a> ";
+            echo "<a href='carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
 
             echo "</td>";
             echo "</tr>";
         }
     } else {
-        echo "<tr><td colspan='6'>Nenhum livro cadastrado.</td></tr>";
+        echo "<tr><td colspan='6'>Nenhum livro cadastrado</td></tr>";
     }
 /* video editar dados no formulario: https://www.youtube.com/watch?v=sNqH8Nql1iA */ 
     ?>

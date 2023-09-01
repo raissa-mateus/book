@@ -1,24 +1,5 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-
-    $sql = "SELECT password FROM users WHERE username = '$username'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows == 1) {
-        $row = $result->fetch_assoc();
-        if (password_verify($password, $row["password"])) {
-            session_start();
-            $_SESSION["username"] = $username;
-            echo "Login bem-sucedido.";
-        } else {
-            echo "Senha incorreta.";
-        }
-    } else {
-        echo "Usuário não encontrado.";
-    }
-}
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -125,7 +106,7 @@ body {
 }
 
 /* estilização botao enviar*/
-.enviar {
+#enviar {
   background-color: #BEA4F1;
   height: 30px;
   width: 100%;
@@ -140,26 +121,29 @@ body {
 
    <img class="logo" src="imagens/logo-book-dream.png" width="30%">
                 <div id="login">
-            <form class="card">
+            <form method="POST" action="processaLogin.php" class="card">
 		<!--<fieldset>-->
 	    <div class="cabecalho-card">
             <h2>Login</h2>
-            <a href="index.html"></a>
+
         </div> <!--class="cabecalho-card"-->
 
     <div class="conteudo-card">
         <div class="conteudo-card-area">
-   			<label for="username">Usuário </label> 
-        <input type="text"  id="username" required="required" autocomplete="off"/> 
+   			<label for="usuario">Usuário </label> 
+        <input type="text"  id="usuario"  name="usuario" required>
         </div>
         <div class="conteudo-card-area">
-            <label for="password">Senha </label> 
-        <input type="password"  id="password" required="required" autocomplete="off"/>
+            <label for="senha">Senha </label> 
+        <input type="password"  id="senha"  name="senha" required>
         </div>
     </div> <!--class="conteudo-card"-->
 
     <div class="card-rodape">
-        <input type="submit" class="enviar" onclick="window.location.href = 'index.html' " value="Enviar" />
+    <div class="botoes">
+        <button type="submit" id="enviar">Enviar</button>
+      </div>
+        <!--<input type="submit" class="enviar" onclick="window.location.href = 'index.html' " value="Enviar" /> -->
         
 
      <!--   <p class="link">
@@ -170,7 +154,14 @@ body {
     </div> <!--class="card-rodape"-->
     </form>
     </div> <!--id="login"-->
-</
+     <!-- Exibir mensagem de erro, se houver -->
+     <?php
+    //if (isset($_SESSION['login_error'])) {
+   //     echo '<p>' . $_SESSION['login_error'] . '</p>';
+   //     unset($_SESSION['login_error']);
+   // }
+    ?>
+
 </body>
 </html>
 

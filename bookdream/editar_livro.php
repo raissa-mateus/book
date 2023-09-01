@@ -1,13 +1,12 @@
 <?php
 session_start();
-
-// Verificar se o usuário está autenticado
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
-} 
-
+include_once("conexao.php");
+$id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+$result_livro = "SELECT * FROM livros WHERE id = '$id'";
+$resultado_livro = mysqli_query($conn, $result_livro);
+$row_livro = mysqli_fetch_assoc($resultado_livro);
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -225,12 +224,13 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <div id="menu1">
             <a href="cadlivro.php">Cadastro</a>
             <a href="estoque.php">Estoque</a>
-            <a href="carrinho.php">Venda</a>
+            <a href="carrinho.php">carrinho</a>
             
 
         </div>
         <div id="menu2">
-            <a href="logout.php">Sair</a>
+            <a href="">Sair</a>
+            <a href="login.php">login</a>
         </div>
     </div>
 <body>
@@ -239,45 +239,52 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   <!-- Conteúdo principal -->
   <div class="container">
 
-    <h2>Cadastro de Livros</h2>
+    <h2>Editar Livros</h2>
     <!--<h3 class="h3inferiores">CADASTRO DE LIVRO</h3> -->
-
-    <form  method="POST" action="processalivros.php">
-
+    <?php
+		if(isset($_SESSION['msg'])){
+			echo $_SESSION['msg'];
+			unset($_SESSION['msg']);
+		}
+		?>
+		<form method="POST" action="proc_edit_livro.php">
       <div class="div1">
+      <input type="hidden" name="id" value="<?php echo $row_livro['id']; ?>">
         <label for="titulo">Título:</label>
-        <input type="text" id="titulo" name="titulo" placeholder="" required>
+        <input type="text" id="titulo" name="titulo" placeholder="" value="<?php echo $row_livro['titulo']; ?>" required>
       </div>
 
       <div class="div2">
         <label for="autor">Autor:</label>
-        <input type="text" id="autor" name="autor" placeholder="" required>
+        <input type="text" id="autor" name="autor" placeholder="" value="<?php echo $row_livro['autor']; ?>" required>
       </div>
 
       <div class="div2">
         <label for="editora">Editora:</label>
-        <input type="text" id="editora" name="editora" placeholder="" required>
+        <input type="text" id="editora" name="editora" placeholder="" value="<?php echo $row_livro['editora']; ?>"required>
       </div>
 
       <div class="div3">
           <label for="genero">Gênero </label>
           <select name="genero" id="genero">
             <option></option>
-            <option value="Romance">Romance</option>
-            <option value="Fantasia">Fantasia</option>
-            <option value="Ficção Cientfica">Ficção Científica</option>
-            <option value="Ficção Policial">Ficção Policial</option>
-            <option value="Ação e Aventura">Ação e Aventura</option>
-            <option value="Terror">Terror</option>
-            <option value="Infantil">Infantil</option>
-            <option value="LGBTQIA+">LGBTQIA+</option>
-            <option value="Distopia">Distopia</option>
-            <option value="Suspense">Suspense</option>
-            <option value="Young Adult">Young Adult</option>
-            <option value="New Adult">New Adult</option>
-            <option value="Biografia">Biografia</option>
-            <option value="Conto">Conto</option>
-            <option value="Poesia">Poesia</option>
+            <option></option>
+            <option value="Romance" <?php if ($row_livro['genero'] == 'Romance') echo 'selected'; ?>>Romance</option>
+            <option value="Fantasia" <?php if ($row_livro['genero'] == 'Fantasia') echo 'selected'; ?>>Fantasia</option>
+            <option value="Ficção Científica" <?php if ($row_livro['genero'] == 'Ficção Científica') echo 'selected'; ?>>Ficção Científica</option>
+            <option value="Ficção Policial" <?php if ($row_livro['genero'] == 'Ficção Policial') echo 'selected'; ?>>Ficção Policial</option>
+            <option value="Ação e Aventura" <?php if ($row_livro['genero'] == 'Ação e Aventura') echo 'selected'; ?>>Ação e Aventura</option>
+            <option value="Terror" <?php if ($row_livro['genero'] == 'Terror') echo 'selected'; ?>>Terror</option>
+            <option value="Infantil" <?php if ($row_livro['genero'] == 'Infantil') echo 'selected'; ?>>Infantil</option>
+            <option value="LGBTQIA+" <?php if ($row_livro['genero'] == 'LGBTQIA+') echo 'selected'; ?>>LGBTQIA+</option>
+            <option value="Distopia" <?php if ($row_livro['genero'] == 'Distopia') echo 'selected'; ?>>Distopia</option>
+            <option value="Suspense" <?php if ($row_livro['genero'] == 'Suspense') echo 'selected'; ?>>Suspense</option>
+            <option value="Young Adult" <?php if ($row_livro['genero'] == 'Young Adult') echo 'selected'; ?>>Young Adult</option>
+            <option value="New Adult" <?php if ($row_livro['genero'] == 'New Adult') echo 'selected'; ?>>New Adult</option>
+            <option value="Biografia" <?php if ($row_livro['genero'] == 'Biografia') echo 'selected'; ?>>Biografia</option>
+            <option value="Conto" <?php if ($row_livro['genero'] == 'Conto') echo 'selected'; ?>>Conto</option>
+            <option value="Poesia" <?php if ($row_livro['genero'] == 'Poesia') echo 'selected'; ?>>Poesia</option>
+
           </select>
         </div> <!-- FIM GENERO-->
             
@@ -285,28 +292,28 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 <label for="classificacao">Classificação</label>
                 <select name="classificacao" id="classificacao">Classificação
                    <option value=""></option>
-                    <option value="livre">Livre</option>
-                    <option value="10">10 anos</option>
-                    <option value="12">12 anos</option>
-                    <option value="14">14 anos</option>
-                    <option value="16">16 anos</option>
-                    <option value="18">18 anos</option>
+                    <option value="livre" <?php if ($row_livro['classificacao'] == 'livre') echo 'selected'; ?>>Livre</option>
+                    <option value="10" <?php if ($row_livro['classificacao'] == '10') echo 'selected'; ?>>10 anos</option>
+                    <option value="12" <?php if ($row_livro['classificacao'] == '12') echo 'selected'; ?>>12 anos</option>
+                    <option value="14" <?php if ($row_livro['classificacao'] == '14') echo 'selected'; ?>>14 anos</option>
+                    <option value="16" <?php if ($row_livro['classificacao'] == '16') echo 'selected'; ?>>16 anos</option>
+                    <option value="18" <?php if ($row_livro['classificacao'] == '18') echo 'selected'; ?>>18 anos</option>
                 </select>
             </div>
 
             <div  class="div5">
               <label for="qtd">Quantidade</label>
-              <input type="number" id="qtd" name="qtd" min="1" required>
+              <input type="number" id="qtd" name="qtd" min="1" value="<?php echo $row_livro['qtd']; ?>" required>
             </div>
 
             <div  class="div6">
                 <label for="idioma">Idioma </label>
                 <select name="idioma" id="idioma">Idioma
                 <option value=""></option>
-                <option value="Português">Português</option>
-                    <option value="Inglês">Inglês</option>
-                    <option value="Espanhol">Espanhol</option>
-                    <option value="Outro">Outro</option>
+                <option value="Português" <?php if ($row_livro['idioma'] == 'Português') echo 'selected'; ?>>Português</option>
+                    <option value="Inglês" <?php if ($row_livro['idioma'] == 'Inglês') echo 'selected'; ?>>Inglês</option>
+                    <option value="Espanhol" <?php if ($row_livro['idioma'] == 'Espanhol') echo 'selected'; ?>>Espanhol</option>
+                    <option value="Outro" <?php if ($row_livro['idioma'] == 'Outro') echo 'selected'; ?>>Outro</option>
                 </select>
                 </div>
             </br>
