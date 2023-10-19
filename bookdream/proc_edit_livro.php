@@ -28,6 +28,6 @@ if(mysqli_affected_rows($conn)){
 //	$_SESSION['msg'] = "<p style='color:green;'>Livro editado com sucesso</p>";
 	header("Location: estoque.php");
 }else{
-	$_SESSION['msg'] = "<p style='color:red;'>Livro não foi editado com sucesso</p>";
+	$_SESSION['msg'] = "<p style='color:red;'>Não houveram alterações</p>";
 	header("Location: editar_livro.php?id=$id");
 }

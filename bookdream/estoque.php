@@ -26,8 +26,12 @@ $result = $conn->query($sql);
     <title>Estoque de Livros</title>
     <style>
     body {
-            font-family: Arial, sans-serif;
-        }
+      margin-left: 8px;
+      margin-top: 8px;
+      margin-right:8px;
+      background-color: #fff;
+      font-family: Arial, sans-serif;
+    }
 
         .container {
           max-width: 90%;
@@ -63,7 +67,7 @@ $result = $conn->query($sql);
         }
 
         #menu2 {
-          margin-left: 690px;
+          margin-left: 830px;
         }
         #header {
         margin-left: 0;
@@ -121,11 +125,10 @@ $result = $conn->query($sql);
         <div id="menu1">
             <a href="cadlivro.php">Cadastro</a>
             <a href="estoque.php">Estoque</a>
-            <a href="carrinho.php">Carrinho</a>
+            <a href="carrinho.php">Venda</a>
         </div>
         <div id="menu2">
             <a href="logout.php">Sair</a>
-            <a href="login.php">login</a>
         </div>
     </div>
 <body>

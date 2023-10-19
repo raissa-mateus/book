@@ -230,7 +230,7 @@ $row_livro = mysqli_fetch_assoc($resultado_livro);
         </div>
         <div id="menu2">
             <a href="">Sair</a>
-            <a href="login.php">login</a>
+            <a href="login.php">Login</a>
         </div>
     </div>
 <body>
