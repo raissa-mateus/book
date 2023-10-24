@@ -188,7 +188,7 @@ $result = $conn->query($sql);
             echo "<td>" . $row["qtd"] . "</td>";
             echo "<td>";
             echo "<a href='editar_livro.php?id=" . $row["id"] . "'>editar</a> ";
-            echo "<a href='carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
+          //  echo "<a href='carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
 
             echo "</td>";
             echo "</tr>";
