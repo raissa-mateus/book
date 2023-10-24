@@ -23,10 +23,9 @@ $row_livro = mysqli_fetch_assoc($resultado_livro);
         */
         /* Estilos para o formulário ... */
 
-          body {
-      margin-left: 0px;
-      margin-top:0px;
-      margin-right:0px;
+          
+        body {
+      
       background-color: #fff;
     }
     
@@ -80,7 +79,7 @@ $row_livro = mysqli_fetch_assoc($resultado_livro);
         }
 
         #menu2 {
-          margin-left: 720px;
+          margin-left: 830px;
         }
 
         .h3inferiores{
@@ -230,7 +229,6 @@ $row_livro = mysqli_fetch_assoc($resultado_livro);
         </div>
         <div id="menu2">
             <a href="">Sair</a>
-            <a href="login.php">Login</a>
         </div>
     </div>
 <body>

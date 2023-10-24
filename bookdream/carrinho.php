@@ -68,9 +68,7 @@ if (isset($_POST['finalizar_venda'])) {
     <title>Carrinho de Compras</title>
     <style>
         body {
-            margin-left: 8px;
-            margin-top: 8px;
-            margin-right: 8px;
+            
             background-color: #fff;
             font-family: Arial, sans-serif;
         }
@@ -109,7 +107,7 @@ if (isset($_POST['finalizar_venda'])) {
         }
 
         #menu2 {
-            margin-left: 800px;
+            margin-left: 830px;
         }
 
         #header {

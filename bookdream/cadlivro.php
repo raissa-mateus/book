@@ -25,9 +25,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         /* Estilos para o formulário ... */
 
           body {
-      margin-left: 8px;
-      margin-top: 8px;
-      margin-right:8px;
+    
       background-color: #fff;
     }
     

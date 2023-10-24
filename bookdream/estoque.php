@@ -26,9 +26,6 @@ $result = $conn->query($sql);
     <title>Estoque de Livros</title>
     <style>
     body {
-      margin-left: 8px;
-      margin-top: 8px;
-      margin-right:8px;
       background-color: #fff;
       font-family: Arial, sans-serif;
     }

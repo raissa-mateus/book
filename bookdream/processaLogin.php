@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['nomeUsuario'] = $usuario;
     $_SESSION['senhaUsuario'] = $senha;
         // Login bem-sucedido
-        header("Location: cadlivro.php");
+        header("Location: estoque.php");
     exit;
     } else {
         // Login falhou
