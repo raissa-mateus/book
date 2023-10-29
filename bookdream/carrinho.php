@@ -16,33 +16,37 @@ if (!isset($_SESSION['carrinho'])) {
     $_SESSION['carrinho'] = [];
 }
 
+if (!isset($_POST['mostrar_mensagem_erro'])) {
+    $_POST['mostrar_mensagem_erro'] = 0;
+}
+
+
 if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
     $livro_id = $_GET['id'];
 
     // Verifica se há estoque disponível
-    $sql = "SELECT qtd FROM livros WHERE id = $livro_id";
+    $sql = "SELECT qtd, titulo FROM livros WHERE id = $livro_id";
     $result = $conn->query($sql);
+
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $estoque_disponivel = $row['qtd'];
 
-        if ($estoque_disponivel > 0) {
+        // Verifica se a quantidade a ser adicionada é menor ou igual à quantidade disponível
+        if ($estoque_disponivel > 0 && (!isset($_SESSION['carrinho'][$livro_id]) || $_SESSION['carrinho'][$livro_id] < $estoque_disponivel)) {
             if (!isset($_SESSION['carrinho'][$livro_id])) {
                 $_SESSION['carrinho'][$livro_id] = 1;
             } else {
-                // Verifica se a quantidade no carrinho é menor que a quantidade disponível
-                if ($_SESSION['carrinho'][$livro_id] <= $estoque_disponivel) {
-                    $_SESSION['carrinho'][$livro_id]++;
-                } else {
-                    echo "A quantidade selecionada é maior do que a quantidade em estoque.";
-                }
+                $_SESSION['carrinho'][$livro_id]++;
             }
         } else {
-            echo "Não há nenhum livro em estoque.";
+            // Configurar a variável para mostrar a mensagem de erro
+            $mensagem_de_erro = "A quantidade selecionada é maior do que a quantidade em estoque para " . $row['titulo'];
         }
+    } else {
+        echo "Não há nenhum livro em estoque.";
     }
 }
-
 if (isset($_POST['finalizar_venda'])) {
     foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
         $qtd = intval($qtd); // Converte para inteiro
@@ -58,6 +62,23 @@ if (isset($_POST['finalizar_venda'])) {
     header("Location: estoque.php");
     exit;
 }
+
+if (isset($_POST['cancelar_venda'])) {
+    // Limpe o carrinho
+    $_SESSION['carrinho'] = [];
+}
+
+// Adicione o trecho abaixo após a seção de "Cancelar Venda"
+if ($_POST['mostrar_mensagem_erro'] == 1) {
+    echo "<div style='color: red;'>A quantidade selecionada é maior do que a quantidade em estoque para " . $row['titulo'] . ". <form method='post' action='carrinho.php'><input type='submit' name='fechar_mensagem' value='OK'></form></div>";
+}
+
+if (isset($_POST['fechar_mensagem'])) {
+    // Limpar a mensagem, redirecionar ou fazer qualquer ação necessária
+    $_POST['mostrar_mensagem_erro'] = 0; // Isso ocultará a mensagem
+}
+// ...
+
 ?>
 
 <!DOCTYPE html>
@@ -68,7 +89,6 @@ if (isset($_POST['finalizar_venda'])) {
     <title>Carrinho de Compras</title>
     <style>
         body {
-            
             background-color: #fff;
             font-family: Arial, sans-serif;
         }
@@ -107,7 +127,7 @@ if (isset($_POST['finalizar_venda'])) {
         }
 
         #menu2 {
-            margin-left: 830px;
+            margin-left: 800px;
         }
 
         #header {
@@ -206,17 +226,7 @@ if (isset($_POST['finalizar_venda'])) {
                 <th>Ações</th>
             </tr>
             <?php
-            $searchTerm = $_GET['search'] ?? '';
-            $filter = $_GET['filter'] ?? 'titulo';
-
             $sql = "SELECT id, titulo, autor, editora, genero, classificacao, idioma, qtd FROM livros";
-
-            if (!empty($searchTerm)) {
-                $filter = mysqli_real_escape_string($conn, $filter);
-                $searchTerm = mysqli_real_escape_string($conn, $searchTerm);
-                $sql .= " WHERE $filter LIKE '%$searchTerm%'";
-            }
-
             $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
@@ -230,9 +240,25 @@ if (isset($_POST['finalizar_venda'])) {
                     echo "<td>" . $row["idioma"] . "</td>";
                     echo "<td>" . $row["qtd"] . "</td>";
                     echo "<td>";
-                    echo "<a href='carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
-                    echo "</td>";
+                    // Verificar a disponibilidade antes de exibir o botão
+                    if ($row["qtd"] > 0) {
+                        echo "<a href='carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
+                    } else {
+                        echo "Sem estoque";
+                    }
                     echo "</tr>";
+
+                    if (isset($mensagem_de_erro)) {
+                        echo "<tr><td colspan='8' style='color: red;'>" . $mensagem_de_erro . ". <form method='post' action='carrinho.php'><input type='submit' name='fechar_mensagem' value='OK'></form></td></tr>";
+                        unset($mensagem_de_erro); // Limpa a mensagem após exibição
+                    }
+
+                    if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id']) && $livro_id == $row["id"]) {
+                        if ($estoque_disponivel <= 0) {
+                            // Exibir mensagem de erro para o livro atual
+                            //echo "<tr><td colspan='8'>A quantidade selecionada é maior do que a quantidade em estoque para " . $row["titulo"] . "</td></tr>";
+                        }
+                    }
                 }
             } else {
                 echo "<tr><td colspan='8'>Nenhum livro selecionado</td></tr>";
@@ -240,6 +266,7 @@ if (isset($_POST['finalizar_venda'])) {
             ?>
         </table>
         <button type="submit" name="finalizar_venda" value="1">Finalizar Venda</button>
+        <button type="submit" name="cancelar_venda" value="1">Cancelar Venda</button>
     </form>
     <h2>Carrinho</h2>
     <table>
@@ -248,24 +275,18 @@ if (isset($_POST['finalizar_venda'])) {
             <th>Quantidade</th>
         </tr>
         <?php
-    foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
-        $sql = "SELECT titulo, qtd FROM livros WHERE id = $livro_id";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            echo "<tr>";
-            echo "<td>" . $row["titulo"] . "</td>";
-            echo "<td>" . $qtd . "</td>";
-            echo "</tr>";
-
-            if ($qtd >= $row["qtd"]) {
+        foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
+            $sql = "SELECT titulo, qtd FROM livros WHERE id = $livro_id";
+            $result = $conn->query($sql);
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
                 echo "<tr>";
-                echo "<td colspan='2'>A quantidade selecionada é maior do que a quantidade em estoque para " . $row["titulo"] . "</td>";
+                echo "<td>" . $row["titulo"] . "</td>";
+                echo "<td>" . $qtd . "</td>";
                 echo "</tr>";
             }
         }
-    }
-    ?>
+        ?>
     </table>
 </div>
 </body>

@@ -223,7 +223,7 @@ $row_livro = mysqli_fetch_assoc($resultado_livro);
         <div id="menu1">
             <a href="cadlivro.php">Cadastro</a>
             <a href="estoque.php">Estoque</a>
-            <a href="carrinho.php">carrinho</a>
+            <a href="carrinho.php">Venda</a>
             
 
         </div>
