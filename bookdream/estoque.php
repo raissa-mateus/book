@@ -108,12 +108,33 @@ $result = $conn->query($sql);
         td a {
             text-decoration: none;
             padding: 5px 10px;
-            background-color: #007bff;
+            background-color: #FFAFE0;
             color: white;
             border-radius: 5px;
         }
         td a:hover {
             background-color: #0056b3;
+        }
+
+        /* Estilos para os botões */
+        .btn-container {
+            display: flex;
+            justify-content: flex-end; /* Alinhar à direita */
+            margin-top: 20px; /* Espaçamento entre a linha superior */
+        }
+
+        .btn-container button {
+            margin-left: 10px; /* Espaçamento entre os botões */
+            padding: 10px 20px;
+            background-color: #FFAFE0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-container button:hover {
+            background-color: #AFCCF4;
         }
     </style>
 </head>

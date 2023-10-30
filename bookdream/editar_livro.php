@@ -318,7 +318,7 @@ $row_livro = mysqli_fetch_assoc($resultado_livro);
 
 
       <div class="botoes">
-        <a id="voltar" href="">Cancelar</a>
+        <a id="voltar" href="estoque.php">Cancelar</a>
         <button id="cadastrar" type="submit">Cadastrar</button>
       </div>
     </form>
