@@ -17,6 +17,17 @@ if (!isset($_SESSION['carrinho'])) {
     $_SESSION['carrinho'] = [];
 }
 
+
+// Tratamento de adição ou remoção de itens do carrinho (como já existe em seu código)
+
+// Verificar se há uma pesquisa em andamento
+if (isset($_GET['search']) && isset($_GET['filter'])) {
+    $search = $_GET['search'];
+    $filter = $_GET['filter'];
+    // Redirecionar para a página de pesquisa no carrinho com os parâmetros
+    header("Location: pesquisa_carrinho.php?search=$search&filter=$filter");
+    exit;
+}
 // Remover do carrinho
 /*if (isset($_GET['action']) && $_GET['action'] == 'remove' && isset($_GET['id'])) {
     $livro_id = $_GET['id'];
@@ -54,12 +65,41 @@ if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
             }
         } else {
             // Configurar a variável para mostrar a mensagem de erro
-            $mensagem_de_erro = "A quantidade selecionada é maior do que a quantidade em estoque para " . $row['titulo'];
+            $mensagem_de_erro = "Limite selecionado para " . $row['titulo'];
         }
     } else {
         $mensagem_de_erro = "Livro não encontrado."; // Configurar mensagem de erro se o livro não for encontrado
     }
 }
+
+
+if (isset($_POST['finalizar_venda'])) {
+    // Verificar se o carrinho está vazio
+    if (empty($_SESSION['carrinho'])) {
+        $mensagem_de_venda = "O carrinho está vazio. Nenhuma venda foi realizada.";
+    } else {
+        foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
+            $qtd = intval($qtd); // Converte para inteiro
+            if ($qtd >= 0) {
+                // Atualize o estoque no banco de dados
+                $sql = "UPDATE livros SET qtd = qtd - $qtd WHERE id = $livro_id";
+                $conn->query($sql);
+            }
+        }
+
+        // Limpe o carrinho
+        $_SESSION['carrinho'] = [];
+        $mensagem_de_venda = "Venda finalizada com sucesso!";
+    }
+}
+
+if (isset($_POST['cancelar_venda'])) {
+    // Limpe o carrinho
+    $_SESSION['carrinho'] = [];
+    $mensagem_de_venda = "Venda cancelada. O carrinho foi esvaziado.";
+}
+
+/*
 
 if (isset($_POST['finalizar_venda'])) {
     foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
@@ -82,7 +122,7 @@ if (isset($_POST['cancelar_venda'])) {
     $_SESSION['carrinho'] = [];
 }
 
-
+*/
 
 ?>
 
@@ -270,7 +310,7 @@ if (isset($_POST['cancelar_venda'])) {
 
 <div class="container">
     <h2>Estoque de Livros</h2>
-    <form method="get" action="estoque.php">
+    <form method="get" action="pesquisa_carrinho.php">
         <input type="text" name="search" placeholder="Digite sua pesquisa">
         <select name="filter">
             <option value="titulo">Título</option>
