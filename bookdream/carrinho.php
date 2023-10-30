@@ -34,11 +34,10 @@ if (!isset($_POST['mostrar_mensagem_erro'])) {
     $_POST['mostrar_mensagem_erro'] = 0;
 }
 
-
 if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
-    $livro_id = $_GET['id'];    
+    $livro_id = $_GET['id'];
 
-    // Verifica se há estoque disponível
+    // Verifica se o livro existe
     $sql = "SELECT qtd, titulo FROM livros WHERE id = $livro_id";
     $result = $conn->query($sql);
 
@@ -47,7 +46,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
         $estoque_disponivel = $row['qtd'];
 
         // Verifica se a quantidade a ser adicionada é menor ou igual à quantidade disponível
-        if ($estoque_disponivel > 0 && (!isset($_SESSION['carrinho'][$livro_id]) || $_SESSION['carrinho'][$livro_id] < $estoque_disponivel)) {
+        if (!isset($_SESSION['carrinho'][$livro_id]) || $_SESSION['carrinho'][$livro_id] < $estoque_disponivel) {
             if (!isset($_SESSION['carrinho'][$livro_id])) {
                 $_SESSION['carrinho'][$livro_id] = 1;
             } else {
@@ -58,10 +57,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
             $mensagem_de_erro = "A quantidade selecionada é maior do que a quantidade em estoque para " . $row['titulo'];
         }
     } else {
-        echo "Não há nenhum livro em estoque.";
+        $mensagem_de_erro = "Livro não encontrado."; // Configurar mensagem de erro se o livro não for encontrado
     }
 }
-
 
 if (isset($_POST['finalizar_venda'])) {
     foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
@@ -181,6 +179,11 @@ if (isset($_POST['cancelar_venda'])) {
             text-align: center;
         }
 
+        td.status {
+            width: 200px; /* Largura fixa para as colunas de Título e Quantidade */
+        }
+
+
         td a {
             text-decoration: none;
             padding: 5px 10px;
@@ -230,10 +233,11 @@ if (isset($_POST['cancelar_venda'])) {
 <div class="container">
     <h1>Carrinho de Compras</h1>
     <form method="post" action="carrinho.php">
-        <table>
+    <table>
             <tr>
                 <th>Título</th>
                 <th>Quantidade</th>
+                <th class="status">Status</th> <!-- Coluna para o status -->
             </tr>
             <?php
             foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
@@ -244,7 +248,15 @@ if (isset($_POST['cancelar_venda'])) {
                     echo "<tr>";
                     echo "<td>" . $row["titulo"] . "</td>";
                     echo "<td>" . $qtd . "</td>";
+                    
+                    // Verificar se há uma mensagem de erro para este livro
+                    $mensagem_de_erro_para_livro = "";
+                    if (isset($mensagem_de_erro) && $_GET['id'] == $livro_id) {
+                        $mensagem_de_erro_para_livro = "Limite selecionado";
+                    }
+                    echo "<td>" . $mensagem_de_erro_para_livro . "</td>";
 
+                    echo "</tr>";
                 }
             }
             ?>
