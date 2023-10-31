@@ -16,6 +16,27 @@ if ($conn->connect_error) {
 if (!isset($_SESSION['carrinho'])) {
     $_SESSION['carrinho'] = [];
 }
+
+if (isset($_GET['action']) && $_GET['action'] === "add" && isset($_GET['id'])) {
+    $livro_id = $_GET['id'];
+    $sql = "SELECT titulo, qtd FROM livros WHERE id = $livro_id";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $estoque_disponivel = $row['qtd'];
+
+        // Verifica se o livro pode ser adicionado ao carrinho
+        if (!isset($_SESSION['carrinho'][$livro_id]) || $_SESSION['carrinho'][$livro_id] < $estoque_disponivel) {
+            if (!isset($_SESSION['carrinho'][$livro_id])) {
+                $_SESSION['carrinho'][$livro_id] = 1;
+            } else {
+                $_SESSION['carrinho'][$livro_id]++;
+            }
+        }
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -127,10 +148,10 @@ if (!isset($_SESSION['carrinho'])) {
         .btn-container {
             display: flex;
             justify-content: flex-end; /* Alinhar à direita */
-            margin-top: 20px; /* Espaçamento entre a linha superior */
+            margin-top: 20px; /* Espaçamento between a linha superior */
         }
 
-        .btn-container button {
+        .btn-container a {
             margin-left: 10px; /* Espaçamento entre os botões */
             padding: 10px 20px;
             background-color: #FFAFE0;
@@ -138,9 +159,10 @@ if (!isset($_SESSION['carrinho'])) {
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            text-decoration: none;
         }
 
-        .btn-container button:hover {
+        .btn-container a:hover {
             background-color: #AFCCF4;
         }
     </style>
@@ -159,6 +181,9 @@ if (!isset($_SESSION['carrinho'])) {
 </div>
 <div class="container">
     <h1>Carrinho de Compras</h1>
+    <div class="btn-container">
+            <a href="carrinho.php" class="btn-voltar-carrinho">Voltar ao Carrinho</a> <!-- Botão "Voltar ao Carrinho" -->
+        </div>
     <form method="post" action="carrinho.php">
         <table>
             <tr>
@@ -186,33 +211,32 @@ if (!isset($_SESSION['carrinho'])) {
                     $qtd_no_carrinho = isset($_SESSION['carrinho'][$livro_id]) ? $_SESSION['carrinho'][$livro_id] : 0;
                     echo "<tr>";
                     echo "<td>" . $row["titulo"] . "</td>";
-                
-                    // Modifique esta parte para exibir a quantidade corretamente
-                    echo "<td>" . $row["qtd"] . "</td>";
-                
+
+                    // Exibe o estoque disponível subtraindo a quantidade no carrinho
+                    $estoque_disponivel = $row["qtd"] - $qtd_no_carrinho;
+                    echo "<td>" . $estoque_disponivel . "</td>";
+
                     // Verificar se há uma mensagem de erro para este livro
                     $mensagem_de_erro_para_livro = "";
                     if (isset($mensagem_de_erro) && $_GET['id'] == $livro_id) {
                         $mensagem_de_erro_para_livro = "Limite selecionado";
                     }
-                    echo "<td>" . $mensagem_de_erro_para_livro . "</td>";
-                
+                    echo "<td>" . $mensagem_de_erro_para_livro . "</td";
+
                     // Adicionar botão "Adicionar ao Carrinho" se houver estoque disponível
-                    if ($row["qtd"] > 0) {
-                        echo "<td><a href='carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
+                    if ($estoque_disponivel > 0) {
+                        echo "<td><a href='pesquisa_carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
                     } else {
                         echo "<td>Sem estoque</td>";
                     }
-                    
+
                     echo "</tr>";
                 }
-                
+
             }
             ?>
         </table>
-        <div class="btn-container">
-            <a href="carrinho.php" class="btn-voltar-carrinho">Voltar ao Carrinho</a> <!-- Botão "Voltar ao Carrinho" -->
-        </div>
+        
     </form>
 </div>
 </body>

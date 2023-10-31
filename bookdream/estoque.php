@@ -191,6 +191,7 @@ $result = $conn->query($sql);
         $searchTerm = mysqli_real_escape_string($conn, $searchTerm);
         $sql .= " WHERE $filter LIKE '%$searchTerm%'";
     }
+    $sql .= " ORDER BY titulo"; // Adicione esta linha para ordenar por título.
     
     $result = $conn->query($sql);
 

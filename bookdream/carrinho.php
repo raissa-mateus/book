@@ -17,36 +17,9 @@ if (!isset($_SESSION['carrinho'])) {
     $_SESSION['carrinho'] = [];
 }
 
-
-// Tratamento de adição ou remoção de itens do carrinho (como já existe em seu código)
-
-// Verificar se há uma pesquisa em andamento
-if (isset($_GET['search']) && isset($_GET['filter'])) {
-    $search = $_GET['search'];
-    $filter = $_GET['filter'];
-    // Redirecionar para a página de pesquisa no carrinho com os parâmetros
-    header("Location: pesquisa_carrinho.php?search=$search&filter=$filter");
-    exit;
-}
-// Remover do carrinho
-/*if (isset($_GET['action']) && $_GET['action'] == 'remove' && isset($_GET['id'])) {
-    $livro_id = $_GET['id'];
-    if (isset($_SESSION['carrinho'][$livro_id]) && $_SESSION['carrinho'][$livro_id] > 0) {
-        $_SESSION['carrinho'][$livro_id]--;
-        if ($_SESSION['carrinho'][$livro_id] == 0) {
-            unset($_SESSION['carrinho'][$livro_id]);
-        }
-    }
-}*/
-
-
-// teste
-if (!isset($_POST['mostrar_mensagem_erro'])) {
-    $_POST['mostrar_mensagem_erro'] = 0;
-}
-
-if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
-    $livro_id = $_GET['id'];
+// Tratamento de adição ou remoção de itens do carrinho
+if (isset($_POST['add_to_cart']) && isset($_POST['livro_id'])) {
+    $livro_id = $_POST['livro_id'];
 
     // Verifica se o livro existe
     $sql = "SELECT qtd, titulo FROM livros WHERE id = $livro_id";
@@ -64,14 +37,26 @@ if (isset($_GET['action']) && $_GET['action'] == 'add' && isset($_GET['id'])) {
                 $_SESSION['carrinho'][$livro_id]++;
             }
         } else {
-            // Configurar a variável para mostrar a mensagem de erro
-            $mensagem_de_erro = "Limite selecionado para " . $row['titulo'];
+            // Armazenar a mensagem de erro na sessão, associada ao livro
+            $_SESSION['mensagens_de_erro'][$livro_id] = "Limite selecionado para " . $row['titulo'];
         }
+        
     } else {
         $mensagem_de_erro = "Livro não encontrado."; // Configurar mensagem de erro se o livro não for encontrado
     }
 }
 
+//testeeee remover
+if (isset($_POST['remove_from_cart']) && isset($_POST['livro_id'])) {
+    $livro_id = $_POST['livro_id'];
+
+    // Verificar se o livro está no carrinho
+    if (isset($_SESSION['carrinho'][$livro_id]) && $_SESSION['carrinho'][$livro_id] > 0) {
+        $_SESSION['carrinho'][$livro_id]--; // Remover uma unidade
+    }
+}
+
+//fim do teste remover
 
 if (isset($_POST['finalizar_venda'])) {
     // Verificar se o carrinho está vazio
@@ -98,31 +83,6 @@ if (isset($_POST['cancelar_venda'])) {
     $_SESSION['carrinho'] = [];
     $mensagem_de_venda = "Venda cancelada. O carrinho foi esvaziado.";
 }
-
-/*
-
-if (isset($_POST['finalizar_venda'])) {
-    foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
-        $qtd = intval($qtd); // Converte para inteiro
-        if ($qtd >= 0) {
-            // Atualize o estoque no banco de dados
-            $sql = "UPDATE livros SET qtd = qtd - $qtd WHERE id = $livro_id";
-            $conn->query($sql);
-        }
-    }
-
-    // Limpe o carrinho e redirecione
-    $_SESSION['carrinho'] = [];
-    header("Location: estoque.php");
-    exit;
-}
-
-if (isset($_POST['cancelar_venda'])) {
-    // Limpe o carrinho
-    $_SESSION['carrinho'] = [];
-}
-
-*/
 
 ?>
 
@@ -223,7 +183,6 @@ if (isset($_POST['cancelar_venda'])) {
             width: 200px; /* Largura fixa para as colunas de Título e Quantidade */
         }
 
-
         td a {
             text-decoration: none;
             padding: 5px 10px;
@@ -256,6 +215,62 @@ if (isset($_POST['cancelar_venda'])) {
         .btn-container button:hover {
             background-color: #AFCCF4;
         }
+
+        /* Estilos para o botão Adicionar ao Carrinho */
+        .small-button {
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #afccf4;
+            color: white;
+            border-radius: 5px;
+            white-space: nowrap;
+            border: none;
+        }
+
+        .small-button:hover {
+            background-color: #FFAFE0;
+        }
+
+        /* Estilos para a caixa de pesquisa e o botão */
+        .search-form {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .search-form input[type="text"] {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 250px;
+            outline: none;
+        }
+
+        .search-form select {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-left: 10px;
+            outline: none;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            background-color: #FFAFE0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .search-button:hover {
+            background-color: #AFCCF4;
+        }
+ 
     </style>
 </head>
 <body>
@@ -273,33 +288,42 @@ if (isset($_POST['cancelar_venda'])) {
 <div class="container">
     <h1>Carrinho de Compras</h1>
     <form method="post" action="carrinho.php">
-    <table>
+        <table>
             <tr>
                 <th>Título</th>
                 <th>Quantidade</th>
                 <th class="status">Status</th> <!-- Coluna para o status -->
             </tr>
             <?php
-            foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
-                $sql = "SELECT titulo, qtd FROM livros WHERE id = $livro_id";
-                $result = $conn->query($sql);
-                if ($result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    echo "<tr>";
-                    echo "<td>" . $row["titulo"] . "</td>";
-                    echo "<td>" . $qtd . "</td>";
-                    
-                    // Verificar se há uma mensagem de erro para este livro
-                    $mensagem_de_erro_para_livro = "";
-                    if (isset($mensagem_de_erro) && $_GET['id'] == $livro_id) {
-                        $mensagem_de_erro_para_livro = "Limite selecionado";
-                    }
-                    echo "<td>" . $mensagem_de_erro_para_livro . "</td>";
+        foreach ($_SESSION['carrinho'] as $livro_id => $qtd) {
+            $sql = "SELECT titulo, qtd FROM livros WHERE id = $livro_id";
+            $result = $conn->query($sql);
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                echo "<tr>";
+                echo "<td>" . $row["titulo"] . "</td>";
+                echo "<td>" . $qtd . "</td>";
 
-                    echo "</tr>";
-                }
+                // Adicionar botões "Adicionar ao Carrinho" e "Remover do Carrinho"
+                echo "<td>";
+                echo "<form method='post' action='carrinho.php'>";
+                echo "<input type='hidden' name='livro_id' value='" . $livro_id . "'>";
+                echo "<div style='display: flex; align-items: center;'>";
+                echo "<input type='submit' name='remove_from_cart' value='Remover do Carrinho' class='small-button' style='margin-right: 5px;'>";
+                echo "<input type='submit' name='add_to_cart' value='Adicionar ao Carrinho' class='small-button'>";
+                echo "</div>";
+                echo "</form>";
+                echo "</td>";
+
+                // Verificar se há uma mensagem de erro para este livro
+                $mensagem_de_erro_para_livro = isset($_SESSION['mensagens_de_erro'][$livro_id]) ? $_SESSION['mensagens_de_erro'][$livro_id] : "";
+
+                echo "<td>" . $mensagem_de_erro_para_livro . "</td>";
+
+                echo "</tr>";
             }
-            ?>
+        }
+        ?>
         </table>
         <div class="btn-container">
             <button type="submit" name="cancelar_venda" value="1">Cancelar Venda</button>
@@ -310,17 +334,17 @@ if (isset($_POST['cancelar_venda'])) {
 
 <div class="container">
     <h2>Estoque de Livros</h2>
-    <form method="get" action="pesquisa_carrinho.php">
-        <input type="text" name="search" placeholder="Digite sua pesquisa">
-        <select name="filter">
-            <option value="titulo">Título</option>
-            <option value="autor">Autor</option>
-            <option value="editora">Editora</option>
-            <option value="genero">Gênero</option>
-            <option value="classificacao">Classificação</option>
-        </select>
-        <input type="submit" value="Pesquisar">
-    </form>
+    <form method="get" action="pesquisa_carrinho.php" class="search-form">
+    <input type="text" name="search" placeholder="Pesquisar...">
+    <select name="filter">
+        <option value="titulo">Título</option>
+        <option value="autor">Autor</option>
+        <option value="editora">Editora</option>
+        <option value="genero">Gênero</option>
+        <option value="classificacao">Classificação</option>
+    </select>
+    <button type="submit" class="search-button">Pesquisar</button>
+</form>
     <table>
         <tr>
             <th>Título</th>
@@ -333,7 +357,7 @@ if (isset($_POST['cancelar_venda'])) {
             <th>Ações</th>
         </tr>
         <?php
-        $sql = "SELECT id, titulo, autor, editora, genero, classificacao, idioma, qtd FROM livros";
+        $sql = "SELECT id, titulo, autor, editora, genero, classificacao, idioma,  qtd FROM livros ORDER BY titulo";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -347,13 +371,17 @@ if (isset($_POST['cancelar_venda'])) {
                 echo "<td>" . $row["idioma"] . "</td>";
                 echo "<td>" . $row["qtd"] . "</td>";
                 echo "<td>";
-                
+
                 if ($row["qtd"] > 0) {
                     // Adicione o botão "Adicionar ao Carrinho" para cada livro com estoque disponível
-                    echo "<a href='carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
+                    echo "<form method='post' action='carrinho.php'>";
+                    echo "<input type='hidden' name='livro_id' value='" . $row["id"] . "'>";
+                    echo "<input type='submit' name='add_to_cart' value='Adicionar ao Carrinho' class='small-button'>";
+                    echo "</form>";
                 } else {
                     echo "Sem estoque";
                 }
+                echo "</td>";
                 echo "</tr>";
             }
         } else {
