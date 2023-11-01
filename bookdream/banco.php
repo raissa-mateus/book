@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
-$username = "seu_usuario";
-$password = "sua_senha";
+$username = "root";
+$password = "";
 
 // Conexão com o servidor de banco de dados
 $conn = new mysqli($servername, $username, $password);
@@ -65,20 +65,20 @@ if ($conn->query($sql) === TRUE) {
 }
 
 // Adicionar a coluna "genero" na tabela "livros"
-$sql = "ALTER TABLE livros ADD genero TEXT";
+/*$sql = "ALTER TABLE livros ADD genero TEXT";
 if ($conn->query($sql) === TRUE) {
     echo "Coluna 'genero' adicionada na tabela 'livros' com sucesso!<br>";
 } else {
     echo "Erro ao adicionar a coluna 'genero' na tabela 'livros': " . $conn->error . "<br>";
-}
+}*/
 
 // Modificar o tipo de dados da coluna "qtd" na tabela "livros"
-$sql = "ALTER TABLE livros MODIFY qtd INT UNSIGNED NOT NULL";
+/*$sql = "ALTER TABLE livros MODIFY qtd INT UNSIGNED NOT NULL";
 if ($conn->query($sql) === TRUE) {
     echo "Tipo de dados da coluna 'qtd' modificado na tabela 'livros' com sucesso!<br>";
 } else {
     echo "Erro ao modificar o tipo de dados da coluna 'qtd' na tabela 'livros': " . $conn->error . "<br>";
-}
+}*/
 
 // Fechar a conexão com o banco de dados
 $conn->close();

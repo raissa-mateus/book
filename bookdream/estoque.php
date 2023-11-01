@@ -12,6 +12,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+
 // Retrieve book data from the database
 $sql = "SELECT id, titulo, autor, editora, genero, classificacao, idioma, qtd FROM livros";
 $result = $conn->query($sql);
@@ -136,6 +137,47 @@ $result = $conn->query($sql);
         .btn-container button:hover {
             background-color: #AFCCF4;
         }
+
+        /* Estilos para a caixa de pesquisa e o botão */
+        .search-form {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .search-form input[type="text"] {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 250px;
+            outline: none;
+        }
+
+        .search-form select {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-left: 10px;
+            outline: none;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            background-color: #FFAFE0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .search-button:hover {
+            background-color: #AFCCF4;
+        }
+ 
     </style>
 </head>
 <div id="header">
@@ -155,8 +197,8 @@ $result = $conn->query($sql);
 <h1>Estoque de Livros</h1>
 <h2>Consulta de Livros</h2>
 
-<form method="get" action="estoque.php">
-    <input type="text" name="search" placeholder="Digite sua pesquisa">
+<form method="get" action="estoque.php" class="search-form">
+    <input type="text" name="search" placeholder="Pesquisar...">
     <select name="filter">
         <option value="titulo">Título</option>
         <option value="autor">Autor</option>
@@ -164,7 +206,7 @@ $result = $conn->query($sql);
         <option value="genero">Gênero</option>
         <option value="classificacao">Classificação</option>
     </select>
-    <input type="submit" value="Pesquisar">
+    <button type="submit" class="search-button">Pesquisar</button>
 </form>
 <table>
     <tr>

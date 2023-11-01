@@ -190,7 +190,6 @@ if (isset($_GET['action']) && $_GET['action'] === "add" && isset($_GET['id'])) {
                 <th>Título</th>
                 <th>Quantidade</th>
                 <th class="status">Status</th>
-                <th>Ação</th> <!-- Adicionando uma coluna para ação -->
             </tr>
             <?php
             // Verificar se há uma pesquisa em andamento
@@ -226,6 +225,7 @@ if (isset($_GET['action']) && $_GET['action'] === "add" && isset($_GET['id'])) {
                     // Adicionar botão "Adicionar ao Carrinho" se houver estoque disponível
                     if ($estoque_disponivel > 0) {
                         echo "<td><a href='pesquisa_carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
+
                     } else {
                         echo "<td>Sem estoque</td>";
                     }
