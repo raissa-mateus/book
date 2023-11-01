@@ -1,16 +1,6 @@
 <?php
-session_start();
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bookdream";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+session_start(); // Inicia a sessão
+include_once("conexao.php");
 
 // Inicialize o carrinho apenas se ele não existir
 if (!isset($_SESSION['carrinho'])) {

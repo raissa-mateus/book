@@ -1,15 +1,7 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bookdream";
+session_start(); // Inicia a sessão
+include_once("conexao.php");
 
-// Conexão com o banco de dados
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Conexão falhou: " . $conn->connect_error);
-}
 
 // Coletar dados do formulário
 $titulo = $_POST['titulo'];

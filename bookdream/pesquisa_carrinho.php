@@ -1,16 +1,6 @@
 <?php
-session_start();
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bookdream";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+session_start(); // Inicia a sessão
+include_once("conexao.php");
 
 // Inicialize o carrinho apenas se ele não existir
 if (!isset($_SESSION['carrinho'])) {
@@ -184,60 +174,60 @@ if (isset($_GET['action']) && $_GET['action'] === "add" && isset($_GET['id'])) {
     <div class="btn-container">
             <a href="carrinho.php" class="btn-voltar-carrinho">Voltar ao Carrinho</a> <!-- Botão "Voltar ao Carrinho" -->
         </div>
-    <form method="post" action="carrinho.php">
-        <table>
-            <tr>
-                <th>Título</th>
-                <th>Quantidade</th>
-                <th class="status">Status</th>
-            </tr>
-            <?php
-            // Verificar se há uma pesquisa em andamento
-            if (isset($_GET['search']) && isset($_GET['filter'])) {
-                $search = $_GET['search'];
-                $filter = $_GET['filter'];
-                $sql = "SELECT id, titulo, qtd FROM livros WHERE $filter LIKE '%$search%'";
-            } else {
-                // Consulta padrão para exibir o carrinho
-                $sql = "SELECT id, titulo, qtd FROM livros";
-            }
+        <form method="post" action="carrinho.php">
+    <table>
+        <tr>
+            <th>Título</th>
+            <th>Quantidade</th>
+            <th class="status">Status</th>
+        </tr>
+        <?php
+        // Verificar se há uma pesquisa em andamento
+        if (isset($_GET['search']) && isset($_GET['filter'])) {
+            $search = $_GET['search'];
+            $filter = $_GET['filter'];
+            $sql = "SELECT id, titulo, qtd FROM livros WHERE $filter LIKE '%$search%'";
+        } else {
+            // Consulta padrão para exibir o carrinho
+            $sql = "SELECT id, titulo, qtd FROM livros";
+        }
 
-            $result = $conn->query($sql);
+        $result = $conn->query($sql);
 
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $livro_id = $row['id'];
-                    $qtd_no_carrinho = isset($_SESSION['carrinho'][$livro_id]) ? $_SESSION['carrinho'][$livro_id] : 0;
-                    echo "<tr>";
-                    echo "<td>" . $row["titulo"] . "</td>";
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $livro_id = $row['id'];
+                $qtd_no_carrinho = isset($_SESSION['carrinho'][$livro_id]) ? $_SESSION['carrinho'][$livro_id] : 0;
+                echo "<tr>";
+                echo "<td>" . $row["titulo"] . "</td>";
 
-                    // Exibe o estoque disponível subtraindo a quantidade no carrinho
-                    $estoque_disponivel = $row["qtd"] - $qtd_no_carrinho;
-                    echo "<td>" . $estoque_disponivel . "</td>";
+                // Exibe o estoque disponível subtraindo a quantidade no carrinho
+                $estoque_disponivel = $row["qtd"] - $qtd_no_carrinho;
+                echo "<td>" . $estoque_disponivel . "</td>";
 
-                    // Verificar se há uma mensagem de erro para este livro
-                    $mensagem_de_erro_para_livro = "";
-                    if (isset($mensagem_de_erro) && $_GET['id'] == $livro_id) {
-                        $mensagem_de_erro_para_livro = "Limite selecionado";
-                    }
-                    echo "<td>" . $mensagem_de_erro_para_livro . "</td";
+                // Verificar se há uma mensagem de erro para este livro
+                $mensagem_de_erro_para_livro = "";
+                if (isset($mensagem_de_erro) && $_GET['id'] == $livro_id) {
+                    $mensagem_de_erro_para_livro = "Limite selecionado";
+                }
+                echo "<td>" . $mensagem_de_erro_para_livro . "</td";
 
-                    // Adicionar botão "Adicionar ao Carrinho" se houver estoque disponível
-                    if ($estoque_disponivel > 0) {
-                        echo "<td><a href='pesquisa_carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
+                // Adicionar botão "Adicionar ao Carrinho" se houver estoque disponível
+                if ($estoque_disponivel > 0) {
+                    echo "<td><a href='pesquisa_carrinho.php?action=add&id=" . $row["id"] . "'>Adicionar ao Carrinho</a></td>";
 
-                    } else {
-                        echo "<td>Sem estoque</td>";
-                    }
-
-                    echo "</tr>";
+                } else {
+                    echo "<td>Sem estoque</td>";
                 }
 
+                echo "</tr>";
             }
-            ?>
-        </table>
-        
-    </form>
+        } else {
+            echo "<tr><td colspan='3'>Nenhum resultado encontrado.</td></tr>";
+        }
+        ?>
+    </table>
+</form>
 </div>
 </body>
 </html>

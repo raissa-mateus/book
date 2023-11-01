@@ -1,17 +1,6 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bookdream";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
+session_start(); // Inicia a sessão
+include_once("conexao.php");
 
 // Retrieve book data from the database
 $sql = "SELECT id, titulo, autor, editora, genero, classificacao, idioma, qtd FROM livros";

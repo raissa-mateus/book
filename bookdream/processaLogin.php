@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         
         // Senha incorreta ou nome de usuário incorreto, recarregar a página de login
-        echo '<meta http-equiv="refresh" content="1;url=login.php">';
+        echo '<meta http-equiv="refresh" content="1;url=index.php">';
     }
 }
 ?>

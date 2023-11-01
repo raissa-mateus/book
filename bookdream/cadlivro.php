@@ -1,9 +1,10 @@
 <?php
-session_start();
+session_start(); // Inicia a sessão
+include_once("conexao.php");
 
 // Verificar se o usuário está autenticado
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit;
 } 
 
