@@ -260,7 +260,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
       <div class="div3">
           <label for="genero">Gênero </label>
-          <select name="genero" id="genero">
+          <select name="genero" id="genero" required>
             <option></option>
             <option value="Romance">Romance</option>
             <option value="Fantasia">Fantasia</option>
@@ -282,7 +282,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             
             <div  class="div4">
                 <label for="classificacao">Classificação</label>
-                <select name="classificacao" id="classificacao">Classificação
+                <select name="classificacao" id="classificacao" required>Classificação
                    <option value=""></option>
                     <option value="livre">Livre</option>
                     <option value="10">10 anos</option>
@@ -300,7 +300,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
             <div  class="div6">
                 <label for="idioma">Idioma </label>
-                <select name="idioma" id="idioma">Idioma
+                <select name="idioma" id="idioma" required>Idioma
                 <option value=""></option>
                 <option value="Português">Português</option>
                     <option value="Inglês">Inglês</option>
